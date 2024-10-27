@@ -1,0 +1,14 @@
+{
+  "name": "websocket-cpp",
+  "version": "1.0.0",
+  "main": "ws.js",
+  "scripts": {
+    "dev": "node ws.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "ws": "^8.18.0"
+  }
+}
