@@ -1,12 +1,12 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <arpa/inet.h>
-#include <openssl/sha.h>
 #include <openssl/bio.h>
-#include <openssl/evp.h>
 #include <openssl/buffer.h>
+#include <openssl/evp.h>
+#include <openssl/sha.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 /**
  * Websocket framing protocol
@@ -166,8 +166,7 @@ char *receive_frame(int client_fd)
     int bytes_read = recv(client_fd, buffer, sizeof(buffer), 0);
 
     // If no bytes are read or an error occurs, return NULL
-    if (bytes_read <= 0)
-    {
+    if (bytes_read <= 0) {
         return NULL;
     }
 
@@ -175,8 +174,7 @@ char *receive_frame(int client_fd)
     unsigned char opcode = buffer[0] & OPCODE_MASK;
 
     // Check if the client requested to close the connection
-    if (opcode == OPCODE_CLOSE)
-    {
+    if (opcode == OPCODE_CLOSE) {
         printf("Client requested to close the connection.\n");
         return NULL;
     }
@@ -188,8 +186,7 @@ char *receive_frame(int client_fd)
     // Calculate the offset for the masking key and payload based on the payload length
     int mask_offset = MASK_OFFSET_DEFAULT;
     // Check for extended payload length (2 bytes)
-    if (payload_len == EXTENDED_LENGTH_IDENTIFIER)
-    {
+    if (payload_len == EXTENDED_LENGTH_IDENTIFIER) {
         // Read the extended payload length
         payload_len = ntohs(*(uint16_t *)&buffer[MASK_OFFSET_DEFAULT]);
         // Adjust offset to account for the 2-byte length field
@@ -199,8 +196,7 @@ char *receive_frame(int client_fd)
     // Array to hold the masking key if the payload is masked
     unsigned char masking_key[MASKING_KEY_LENGTH];
     // If the mask bit is set, retrieve the masking key
-    if (mask)
-    {
+    if (mask) {
         // Copy the masking key from the buffer
         memcpy(masking_key, &buffer[mask_offset], MASKING_KEY_LENGTH);
         // Adjust offset to point to the payload data
@@ -215,10 +211,8 @@ char *receive_frame(int client_fd)
     payload[payload_len] = '\0';
 
     // If the payload is masked, unmask the data using the masking key
-    if (mask)
-    {
-        for (int i = 0; i < payload_len; ++i)
-        {
+    if (mask) {
+        for (int i = 0; i < payload_len; ++i) {
             // XOR each byte with the masking key
             payload[i] ^= masking_key[i % MASKING_KEY_LENGTH];
         }
@@ -259,8 +253,7 @@ int main()
     // Extract the Sec-WebSocket-Key from the request headers
     char *key_start = strstr(buffer, "Sec-WebSocket-Key: ");
     char key[25];
-    if (key_start)
-    {
+    if (key_start) {
         // Move pointer to the start of the key value
         key_start += 19;
         // Copy up to 24 characters of the key
@@ -295,13 +288,11 @@ int main()
     free(accept_key);
 
     // Main loop to handle incoming messages from the client
-    while (1)
-    {
+    while (1) {
         // Receive a WebSocket frame from the client
         char *message = receive_frame(client_fd);
         // Exit loop if no message is received (client disconnected)
-        if (message == NULL)
-        {
+        if (message == NULL) {
             break;
         }
 
